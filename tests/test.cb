@@ -1,0 +1,9 @@
+import(
+    standard as std,
+    serde::json
+)
+
+int main() {
+    std::println("Hey");
+    return 0; 
+}
