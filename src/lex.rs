@@ -1,36 +1,58 @@
-pub struct Token {
-    pub v: String,
-    pub t: TokenType
-}
-
-impl Token {
-    fn new() -> Self { return Self { v: String::new(), t: TokenType::Null }; }
-    fn from(v: char) -> Self { return Self { v: String::from(v), t: TokenType::Null }; }
-    fn identify(&mut self) {
-        self.t = match self.v.as_str() {
-            "+" => TokenType::Operator(OperatorType::Add)
-        }
-    }
-}
+type Token = String;
+type TokenList = Vec<Token>;
+type TypeList = Vec<TokenType>;
+pub type LexedFile = (TokenList, TypeList);
 
 pub enum TokenType {
-    Identifier(String),
-    Literal(LiteralType),
-    Keyword(String),
     Operator(OperatorType),
+    Misc(MiscType),
+    Keyword(KeywordType),
+    Literal(LiteralType),
+    Identifier(String),
     Null
 }
 
-pub enum OperatorType {
+enum OperatorType {
     Add,
     Minus,
     Multiply,
     Divide,
-    AddOne,
-    MinusOne
+    LessThan,
+    GreaterThan,
+    And,
+    Or,
+    Xor,
+    Set,
+    Not
 }
 
-pub enum LiteralType {
+enum MiscType {
+    OpenParentheses,
+    CloseParentheses,
+    OpenBracket,
+    CloseBracket,
+    OpenSquiggle,
+    CloseSquiggle,
+    Semicolon,
+    Comma,
+    Colon,
+    Dot,
+    SingleQuote,
+    DoubleQuote
+}
+
+enum KeywordType {
+    As,
+    If,
+    For,
+    While,
+    Else,
+    Not,
+    Return,
+    
+}
+
+enum LiteralType {
     UInteger8(u8),
     Integer8(i8),
     UInteger16(u16),
@@ -41,24 +63,23 @@ pub enum LiteralType {
     Integer64(i64),
     UInteger128(u128),
     Integer128(i128),
-    // Float16(f16),
+    // Float16(f16), Unstable
     Float32(f32),
     Float64(f64),
-    // Float128(f128),
-    String(String),
+    // Float128(f128), Unstable
+    StringLit(String),
     Character(char),
-    Boolean(bool)
+    Boolean(bool),
+    Void,
 }
-type LexedFile = Vec<Token>;
 
-pub fn lex_file(file_contents: &String) -> LexedFile {
-    let mut tokens: LexedFile = vec![Token::new()];
+pub fn lex_file(file_contents: &String) -> TokenList {
+    let mut tokens: TokenList = vec![Token::new()];
     let (mut in_comment, mut in_string, mut in_char, mut escaped) = (false, false, false, false);
     
     for c in file_contents.chars() {
         let lt: &mut String = &mut tokens.last_mut()
-            .expect("No last value")
-            .v;
+            .expect("No last value");
         
         if !in_comment {
             match c {
@@ -113,7 +134,7 @@ pub fn lex_file(file_contents: &String) -> LexedFile {
                         }
                     }
                 }
-                ';' | '(' | '<' | '{' | '[' | ')' | '>' | '}' | ']' | ',' => {
+                ';' | '(' | '<' | '{' | '[' | ')' | '>' | '}' | ']' | ',' | '+' | '-' | '*' | '/' => {
                     if in_string || in_char { lt.push(c); }
                     else {
                         if lt.is_empty() { lt.push(c); }
@@ -138,6 +159,91 @@ pub fn lex_file(file_contents: &String) -> LexedFile {
         }
     }
 
-    
     return tokens;   
+}
+pub fn lex_program(file_contents: &String) -> LexedFile {
+    let unlexed_tokens = lex_file(file_contents);
+    let mut lexed_tokens: TypeList = vec![];
+    
+    for (i, t) in unlexed_tokens.iter().enumerate() {
+        lexed_tokens.push(
+            match t.as_str() {
+                "+" => { TokenType::Operator(OperatorType::Add) }
+                "-" => { TokenType::Operator(OperatorType::Minus) }
+                "*" => { TokenType::Operator(OperatorType::Multiply) }
+                "/" => { TokenType::Operator(OperatorType::Divide) }
+                "<" => { TokenType::Operator(OperatorType::LessThan) }
+                ">" => { TokenType::Operator(OperatorType::GreaterThan) }
+                "&" => { TokenType::Operator(OperatorType::And) }
+                "|" => { TokenType::Operator(OperatorType::Or) }
+                "^" => { TokenType::Operator(OperatorType::Xor) }
+                "=" => { TokenType::Operator(OperatorType::Set) }
+                "!" => { TokenType::Operator(OperatorType::Not) }
+    
+                "(" => { TokenType::Misc(MiscType::OpenParentheses) }
+                ")" => { TokenType::Misc(MiscType::CloseParentheses) }
+                "[" => { TokenType::Misc(MiscType::OpenBracket) }
+                "]" => { TokenType::Misc(MiscType::CloseBracket) }
+                "{" => { TokenType::Misc(MiscType::OpenSquiggle) }
+                "}" => { TokenType::Misc(MiscType::CloseSquiggle) }
+                ";" => { TokenType::Misc(MiscType::Semicolon) }
+                "," => { TokenType::Misc(MiscType::Comma) }
+                ":" => { TokenType::Misc(MiscType::Colon) }
+                "." => { TokenType::Misc(MiscType::Dot) }
+                "'" => { TokenType::Misc(MiscType::SingleQuote) }
+                "\"" => { TokenType::Misc(MiscType::DoubleQuote) }
+    
+                "as" => { TokenType::Keyword(KeywordType::As) }
+                "if" => { TokenType::Keyword(KeywordType::If) }
+                "for" => { TokenType::Keyword(KeywordType::For) }
+                "while" => { TokenType::Keyword(KeywordType::While) }
+                "else" => { TokenType::Keyword(KeywordType::Else) }
+                "not" => { TokenType::Keyword(KeywordType::Not) }
+                "return" => { TokenType::Keyword(KeywordType::Return) }
+                
+                "true" => { TokenType::Literal(LiteralType::Boolean(true)) }
+                "false" => { TokenType::Literal(LiteralType::Boolean(false)) }
+                other => { 
+                    // Checking if token is a number literal
+                    if "0123456789".contains(other.chars().next().unwrap_or_default()) {
+                        // Checking if token is a float literal
+                        if unlexed_tokens[i + 1].as_str() == "." && "0123456789".contains(unlexed_tokens[i + 2].chars().next().unwrap_or_default()) {
+                            TokenType::Literal(LiteralType::Float64(unlexed_tokens[i..i + 2]
+                                .join("")
+                                .parse()
+                                .expect(
+                                    format!("Failed to unwrap unknown token {i} as float64")
+                                        .as_str()
+                                )
+                            ))
+                        // Must be an int literal
+                        } else {
+                            TokenType::Literal(LiteralType::Integer128(other
+                                .parse()
+                                .expect(
+                                    format!("Failed to unwrap unknown token {i} as int128")
+                                        .as_str()
+                                )
+                            ))
+                        }
+                    // checking if either string or character literal or identifier
+                    } else {
+                        let last = lexed_tokens.last().unwrap_or(&TokenType::Null);
+                        // Character literal
+                        if let TokenType::Misc(MiscType::SingleQuote) = last {
+                            TokenType::Literal(LiteralType::Character(other.parse().unwrap_or_default()))
+                        // String literal
+                        } else if let TokenType::Misc(MiscType::DoubleQuote) = last {
+                            TokenType::Literal(LiteralType::StringLit(t.clone()))
+                        } else {
+                            TokenType::Identifier(t.clone())
+                        }
+                    }
+                }
+            }
+        ); 
+        
+    }
+    
+    return (unlexed_tokens, lexed_tokens);
 }
