@@ -1,7 +1,9 @@
+package test;
+
 import(
     standard as std,
     serde::json
-)
+);
 
 int main() {
     std::println("Hey");
