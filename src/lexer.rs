@@ -12,7 +12,7 @@ pub enum TokenType {
     Null
 }
 
-enum OperatorType {
+pub enum OperatorType {
     Add,
     Minus,
     Multiply,
@@ -26,7 +26,7 @@ enum OperatorType {
     Not
 }
 
-enum MiscType {
+pub enum MiscType {
     OpenParentheses,
     CloseParentheses,
     OpenBracket,
@@ -41,7 +41,7 @@ enum MiscType {
     DoubleQuote
 }
 
-enum KeywordType {
+pub enum KeywordType {
     As,
     If,
     For,
@@ -54,7 +54,7 @@ enum KeywordType {
     
 }
 
-enum LiteralType {
+pub enum LiteralType {
     UInteger8(u8),
     Integer8(i8),
     UInteger16(u16),
