@@ -2,7 +2,7 @@ use std::{
     any::Any,
     collections::HashMap
 };
-use crate::lexer::{
+use crate::types::{
     TypeList,
     TokenType,
     OperatorType,
