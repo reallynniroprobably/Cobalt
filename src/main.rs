@@ -1,5 +1,6 @@
 use std::fs;
 mod lexer;
+mod parser;
 
 fn main() {
     let test: &str = "test";
