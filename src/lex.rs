@@ -49,6 +49,8 @@ enum KeywordType {
     Else,
     Not,
     Return,
+    Package,
+    Match
     
 }
 
@@ -200,7 +202,10 @@ pub fn lex_program(file_contents: &String) -> LexedFile {
                 "else" => { TokenType::Keyword(KeywordType::Else) }
                 "not" => { TokenType::Keyword(KeywordType::Not) }
                 "return" => { TokenType::Keyword(KeywordType::Return) }
-                
+                "package" => { TokenType::Keyword(KeywordType::Package) }
+                "match" => { TokenType::Keyword(KeywordType::Match) }
+
+                // Boolean literals
                 "true" => { TokenType::Literal(LiteralType::Boolean(true)) }
                 "false" => { TokenType::Literal(LiteralType::Boolean(false)) }
                 other => { 
