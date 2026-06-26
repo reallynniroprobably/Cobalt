@@ -1,3 +1,7 @@
+use std::{
+    any::Any,
+    collections::HashMap
+};
 use crate::lexer::{
     TypeList,
     TokenType,
@@ -6,3 +10,13 @@ use crate::lexer::{
     KeywordType,
     LiteralType
 };
+
+struct CobaltType {
+    identifier: &'static str,
+    values: HashMap<&'static str, Option<Box<dyn Any>>>
+}
+struct CobaltVariable {
+    identifier: &'static str,
+    type_identifier: &'static str,
+    value: CobaltType,
+}
