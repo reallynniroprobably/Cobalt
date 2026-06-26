@@ -1,6 +1,6 @@
 type Token = String;
-type TokenList = Vec<Token>;
-type TypeList = Vec<TokenType>;
+pub type TokenList = Vec<Token>;
+pub type TypeList = Vec<TokenType>;
 pub type LexedFile = (TokenList, TypeList);
 
 pub enum TokenType {
