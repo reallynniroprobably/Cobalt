@@ -1,3 +1,5 @@
+use std::any::Any;
+
 pub type Token = String;
 pub type TokenList = Vec<Token>;
 pub type TypeList = Vec<TokenType>;
@@ -50,8 +52,8 @@ pub enum KeywordType {
     Not,
     Return,
     Package,
-    Match
-    
+    Match,
+    Mut,
 }
 
 pub enum LiteralType {

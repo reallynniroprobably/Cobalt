@@ -139,6 +139,7 @@ pub fn lex_program(file_contents: &String) -> LexedFile {
                 "return" => { TokenType::Keyword(KeywordType::Return) }
                 "package" => { TokenType::Keyword(KeywordType::Package) }
                 "match" => { TokenType::Keyword(KeywordType::Match) }
+                "mut" => { TokenType::Keyword(KeywordType::Mut) }
 
                 // Boolean literals
                 "true" => { TokenType::Literal(LiteralType::Boolean(true)) }
