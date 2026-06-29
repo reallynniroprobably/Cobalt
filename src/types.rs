@@ -1,5 +1,3 @@
-use std::any::Any;
-
 pub type Token = String;
 pub type TokenList = Vec<Token>;
 pub type TypeList = Vec<TokenType>;
