@@ -7,5 +7,7 @@ import {
 
 int main() {
     std::println("Hey");
+    String message = "Hello!";
+    std::println("Message: \"{message}\""); # Did i seriously mess up backslash and front :sob:
     return 0; 
 }
