@@ -64,15 +64,20 @@ pub fn tokenise(file_contents: &str) -> Vec<Token> {
             }
             match c {
                 ' '|'\t'|'\n' => { // Whitespace case
-                    if !ct.raw.is_empty() {
-                        ct.token_type = classify_token(&(ct.raw));
-                        tokens.push(Token::new());
+                    if !in_string && !in_char {
+                        if !ct.raw.is_empty() {
+                            ct.token_type = classify_token(&(ct.raw));
+                            tokens.push(Token::new());
+                        }
+                    } else {
+                        ct.raw.push(c);
                     }
                 }
                 '"' => {
                     if in_string {
                         if escaped {
                             ct.raw.push(c);
+                            escaped = false;
                         } else {
                             if !ct.raw.is_empty() {
                                 ct.token_type = TokenType::StringLiteral(ct.raw.clone());
@@ -98,6 +103,7 @@ pub fn tokenise(file_contents: &str) -> Vec<Token> {
                     if in_char {
                         if escaped {
                             ct.raw.push(c);
+                            escaped = false;
                         } else {
                             if !ct.raw.is_empty() {
                                 ct.token_type = TokenType::CharLiteral(ct.raw.chars().next().unwrap());
@@ -119,27 +125,30 @@ pub fn tokenise(file_contents: &str) -> Vec<Token> {
                         in_char = true;
                     }
                 }
-                '/' => {
+                '\\' => {
                     if escaped {
-                        if in_string { ct.raw.push(c); }
-                        else { in_comment = true; }
+                        if in_string || in_char { ct.raw.push(c); }
                         escaped = false;
                     } else {
-                        if !ct.raw.is_empty() {
-                            ct.token_type = classify_token(&(ct.raw));
-                            tokens.push(Token::new());
-                        }
                         escaped = true;
                     }
+                }
+                '#' => {
+                    if !in_string && !in_char { in_comment = true; }
+                    else { ct.raw.push(c); }
                 }
                 _ => {
                     if "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz".contains(c) { ct.raw.push(c); }
                     else {
-                        if !ct.raw.is_empty() {
-                            ct.token_type = classify_token(&(ct.raw));
-                            tokens.push(Token::from(c));
-                        } else { ct.raw.push(c); }
-                        tokens.push(Token::new());
+                        if !in_string && !in_char {
+                            if !ct.raw.is_empty() {
+                                ct.token_type = classify_token(&(ct.raw));
+                                tokens.push(Token::from(c));
+                            } else { ct.raw.push(c); }
+                            tokens.push(Token::new());
+                        } else {
+                            ct.raw.push(c);
+                        }
                     }
                 }
             }
