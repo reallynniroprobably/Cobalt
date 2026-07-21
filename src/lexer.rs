@@ -17,7 +17,9 @@ pub enum TokenType {
     ClosingSquiggle,
     Colon,
     As,
-    Return
+    Return,
+    Package,
+    Import
 }
 
 pub struct Token {
@@ -43,6 +45,8 @@ fn classify_token(raw: &String) -> TokenType {
         ":" => TokenType::Colon,
         "as" => TokenType::As,
         "return" => TokenType::Return,
+        "package" => TokenType::Package,
+        "import" => TokenType::Import,
         
         _ => TokenType::Identifer
     }
