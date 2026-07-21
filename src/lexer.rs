@@ -1,10 +1,21 @@
+#[derive(PartialEq)]
 pub enum TokenType {
     Identifer,
     Null,
     StringLiteral(String),
     DoubleQuote,
     CharLiteral(char),
-    SingleQuote
+    SingleQuote,
+    Not,
+    Equals,
+    Semicolon,
+    OpeningParentheses,
+    ClosingParentheses,
+    OpeningBracket,
+    ClosingBracket,
+    OpeningSquiggle,
+    ClosingSquiggle,
+    Colon
 }
 
 pub struct Token {
@@ -17,7 +28,21 @@ impl Token {
 }
 
 fn classify_token(raw: &String) -> TokenType {
-    TokenType::Identifer
+    match raw.as_str() {
+        "!" => TokenType::Not,
+        "=" => TokenType::Equals,
+        ";" => TokenType::Semicolon,
+        "(" => TokenType::OpeningParentheses,
+        ")" => TokenType::ClosingParentheses,
+        "[" => TokenType::OpeningBracket,
+        "]" => TokenType::ClosingBracket,
+        "{" => TokenType::OpeningSquiggle,
+        "}" => TokenType::ClosingSquiggle,
+        ":" => TokenType::Colon,
+        
+        
+        _ => TokenType::Identifer
+    }
 }
 
 pub fn tokenise(file_contents: &str) -> Vec<Token> {
