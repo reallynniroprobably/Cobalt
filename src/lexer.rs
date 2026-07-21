@@ -15,7 +15,9 @@ pub enum TokenType {
     ClosingBracket,
     OpeningSquiggle,
     ClosingSquiggle,
-    Colon
+    Colon,
+    As,
+    Return
 }
 
 pub struct Token {
@@ -39,7 +41,8 @@ fn classify_token(raw: &String) -> TokenType {
         "{" => TokenType::OpeningSquiggle,
         "}" => TokenType::ClosingSquiggle,
         ":" => TokenType::Colon,
-        
+        "as" => TokenType::As,
+        "return" => TokenType::Return,
         
         _ => TokenType::Identifer
     }
@@ -138,6 +141,7 @@ pub fn tokenise(file_contents: &str) -> Vec<Token> {
             }
             
         }
+        if tokens.last().unwrap().raw.is_empty() { tokens.pop(); }
     }
     return tokens;
 }
