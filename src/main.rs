@@ -8,5 +8,4 @@ fn main() {
     let output: Vec<lexer::Token> = lexer::tokenise(&input);
     fs::write(format!("tests/{test}_output.txt"), output.iter().map(|s| s.raw.as_str()).collect::<Vec<_>>().join("\n"))
         .expect("Failed to write output to file");
-    
 }
