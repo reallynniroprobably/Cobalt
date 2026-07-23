@@ -19,7 +19,12 @@ pub enum TokenType {
     As,
     Return,
     Package,
-    Import
+    Import,
+    Plus,
+    Minus,
+    Multiply,
+    Divide,
+    Modulo
 }
 
 pub struct Token {
@@ -47,6 +52,11 @@ fn classify_token(raw: &String) -> TokenType {
         "return" => TokenType::Return,
         "package" => TokenType::Package,
         "import" => TokenType::Import,
+        "+" => TokenType::Plus,
+        "-" => TokenType::Minus,
+        "*" => TokenType::Multiply,
+        "/" => TokenType::Divide,
+        "%" => TokenType::Modulo,
         
         _ => TokenType::Identifer
     }
